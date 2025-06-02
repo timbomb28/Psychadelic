@@ -80,7 +80,8 @@ public class Triangle implements ResizableImage {
         int x3 = size.width;
         int y3 = size.height;
 
-        drawRecursiveTriangles(gBuffer, x1, y1, x2, y2, x3, y3, 5);
+        int depth = 2 + random.nextInt(10); // Werte von 2 bis 11
+        drawRecursiveTriangles(gBuffer, x1, y1, x2, y2, x3, y3, depth);
 
         gBuffer.dispose();
         return bufferedImage;
