@@ -39,6 +39,11 @@ public class ResizableFrame {
     public void createFrame() {
         frame = new JFrame();
 
+        // image is already assigned in the constructor
+        if (image instanceof triangle.Triangle triangle) {
+            triangle.setRepaintCallback(this::repaint);
+        }
+
         panel = new JPanel() {
             @Override
             public void paintComponent(Graphics g) {
@@ -63,7 +68,6 @@ public class ResizableFrame {
         frame.pack();
         frame.setSize(SIZE, SIZE);
         frame.setVisible(true);
-
     }
 
     int resizeDone = 0;
@@ -94,6 +98,10 @@ public class ResizableFrame {
             printStackTrace("countFullPaint " + countFullPaint);
         }
 
+    }
+
+    public void repaint() {
+        frame.repaint();
     }
 
 }

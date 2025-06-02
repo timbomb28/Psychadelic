@@ -1,4 +1,3 @@
-
 package triangle;
 
 import resizable.ResizableImage;
@@ -8,6 +7,8 @@ import java.awt.image.BufferedImage;
 import java.util.Scanner;
 
 import static resizable.Debug.print;
+import javax.swing.Timer;
+import java.awt.Toolkit;
 
 /**
  * Implement your Sierpinski Triangle here.
@@ -24,15 +25,49 @@ import static resizable.Debug.print;
  */
 public class Triangle implements ResizableImage {
     int drawTriangle = 0;
+
+    private Color backgroundColor = Color.BLACK;
+    private final Timer triangleTimer;
+    private final Timer backgroundTimer;
+    private Runnable repaintCallback;
+
+    public void setRepaintCallback(Runnable repaintCallback) {
+        this.repaintCallback = repaintCallback;
+    }
+
+    public Triangle() {
+        triangleTimer = new Timer(500, e -> {
+            bufferedImage = null;
+            bufferedImageSize = null;
+            if (repaintCallback != null) repaintCallback.run();
+            Toolkit.getDefaultToolkit().sync();
+        });
+        triangleTimer.start();
+
+        backgroundTimer = new Timer(800, e -> {
+            Random rand = new Random();
+            backgroundColor = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256));
+            bufferedImage = null;
+            bufferedImageSize = null;
+            if (repaintCallback != null) repaintCallback.run();
+            Toolkit.getDefaultToolkit().sync();
+        });
+        backgroundTimer.start();
+    }
+
     /**
      * change this method to implement the triangle!
      * @param size the outer bounds of the triangle
      * @return an Image containing the Triangle
      */
     private BufferedImage drawTriangle(Dimension size) {
-        print("drawTriangle: " + ++drawTriangle + " size: " + size);
+        // print("drawTriangle: " + ++drawTriangle + " size: " + size);
         BufferedImage bufferedImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D gBuffer = (Graphics2D) bufferedImage.getGraphics();
+
+        // Fülle Hintergrund mit aktueller Hintergrundfarbe
+        gBuffer.setColor(backgroundColor);
+        gBuffer.fillRect(0, 0, size.width, size.height);
 
         Random random = new Random();
         gBuffer.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256)));
@@ -89,7 +124,7 @@ public class Triangle implements ResizableImage {
 
     @Override
     public Image getImage(Dimension triangleSize) {
-        if (triangleSize.equals(bufferedImageSize))
+        if (bufferedImage != null && triangleSize.equals(bufferedImageSize))
             return bufferedImage;
         bufferedImage = drawTriangle(triangleSize);
         bufferedImageSize = triangleSize;
